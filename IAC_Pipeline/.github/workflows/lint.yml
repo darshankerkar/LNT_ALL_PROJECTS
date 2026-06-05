@@ -1,0 +1,31 @@
+name: Terraform Lint 
+
+on: 
+  pull_request: 
+    branches: main 
+
+jobs: 
+  lint: 
+    runs-on: ubuntu-latest 
+    steps: 
+      - uses: actions/checkout@v4 
+      - uses: hashicorp/setup-terraform@v3 
+        with: 
+          terraform_version: "1.7.0" 
+      - name: Check formatting 
+        run: terraform fmt -check -recursive 
+        # Exits with code 1 if any file is not canonical format 
+        # This FAILS the job and blocks the PR 
+        
+      - name: Validate syntax 
+        run: | 
+          terraform init -backend=false 
+          terraform validate 
+        # -backend=false: skip remote state during lint (faster) 
+        
+      - name: Run tflint (advanced lint rules) 
+        uses: terraform-linters/setup-tflint@v4 
+        
+      - run: | 
+          tflint --init 
+          tflint --recursive

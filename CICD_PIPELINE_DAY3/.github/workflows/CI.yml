@@ -1,0 +1,25 @@
+# key: value
+
+name: CI # normal anything
+
+on: # when must gh actions work 
+  push: # works for two branches 
+    branches: # list hence - (multiple values)
+      - main
+      - feature-1
+
+jobs: # tasks
+  test: # multiple jobs like build, push, test, merge
+    runs-on: ubuntu-latest # runs on which machine (VM)
+
+    steps: # how will it run
+      - uses: actions/checkout@v4 # actions repo always (checkout func v4), see gh actions workflow
+      # - uses: actions/setup-python 
+      - name: Install Dependencies 
+        run: pip install pytest # to install
+
+      - name : Run Tests
+        run: pytest # to run test cases
+
+      - name : Take pylint report
+        run : pylint calculator.py || true

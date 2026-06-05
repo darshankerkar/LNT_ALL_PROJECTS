@@ -1,0 +1,19 @@
+name : CICD Demo CI
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3 
+        with: 
+          terraform_version: "1.7.0" 
+      - name: Validate 
+        run: terraform validate
+

@@ -1,0 +1,30 @@
+name: Terraform Apply 
+
+on: 
+  push: 
+    branches: [main] # Triggers only on merge to main 
+
+jobs: 
+  apply: 
+    runs-on: ubuntu-latest 
+    environment: production # Requires manual approval gate (configure in repo settings) 
+    steps: 
+      - uses: actions/checkout@v4 
+      - uses: hashicorp/setup-terraform@v3 
+      
+      - name: Init 
+        run: terraform init 
+        
+      - name: Plan (re-run for safety) 
+        run: terraform plan -out=tfplan # Save plan to file so apply uses exactly what was planned 
+        
+      - name: Apply 
+        run: terraform apply -auto-approve tfplan 
+        
+      - name: Commit updated state back to Git 
+        run: | 
+          git config user.email "ci@github-actions" 
+          git config user.name "GitHub Actions" 
+          git add terraform.tfstate 
+          git diff --staged --quiet || git commit -m "ci: update terraform state after apply [skip ci]" 
+          git push
